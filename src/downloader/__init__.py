@@ -1,1 +1,8 @@
-__all__ = ['BaseDownloader', 'GADMDownloader', 'HealthsitesDownloader', 'PopulationDownloader']
+__all__ = [
+    'BaseDownloader',
+    'GADMDownloader', 
+    'HealthsitesDownloader', 
+    'PopulationDownloader',
+    'CSVDataLoader',
+    'DEMDownloader'
+]

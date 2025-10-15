@@ -1,6 +1,8 @@
 import urllib.request
 import zipfile
 
+from src.downloader.base import BaseDownloader
+
 class GADMDownloader(BaseDownloader):
     """Download administrative boundaries from GADM/Natural Earth"""
     

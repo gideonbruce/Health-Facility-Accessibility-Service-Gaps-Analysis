@@ -1,6 +1,8 @@
 import requests
 import json
 
+from src.downloader.base import BaseDownloader
+
 class HealthsitesDownloader(BaseDownloader):
     """Download health facilities from healthsites.io API"""
     

@@ -1,3 +1,6 @@
+from src.downloader.base import BaseDownloader
+
+
 class PopulationDownloader(BaseDownloader):
     """Handle population raster data"""
     
