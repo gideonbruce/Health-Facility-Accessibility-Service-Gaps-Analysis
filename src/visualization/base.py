@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
+from logger import Logger
+from src.config import Config
 
 class BaseVisualizer(ABC):
     """Abstract base class for visualizations"""
