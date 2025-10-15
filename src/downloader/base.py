@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from logging import Logger
+from logger import Logger
 from pathlib import Path
 
 class BaseDownloader(ABC):
