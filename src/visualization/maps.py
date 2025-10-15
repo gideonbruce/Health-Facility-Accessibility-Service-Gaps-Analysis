@@ -1,4 +1,6 @@
 import folium
+import geopandas as gpd
+from src.visualization.base import BaseVisualizer
 
 class FacilityMapVisualizer(BaseVisualizer):
     """Generate facility location map"""
