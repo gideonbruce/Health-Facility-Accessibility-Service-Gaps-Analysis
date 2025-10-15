@@ -1,6 +1,9 @@
+from typing import List, Optional, cast
 import numpy as np
 from shapely.geometry import Point
 import geopandas as gpd
+
+from src.analysis.base import BaseAnalyzer
 
 class AccessibilityAnalyzer(BaseAnalyzer):
     """Analyze healthcare accessibility"""
@@ -29,11 +32,11 @@ class AccessibilityAnalyzer(BaseAnalyzer):
     def classify_accessibility(
         self,
         population: gpd.GeoDataFrame,
-        thresholds_km: list = None
+        thresholds_km: Optional[List[float]] = None
     ) -> gpd.GeoDataFrame:
         """Classify accessibility by threshold"""
         if thresholds_km is None:
-            thresholds_km = self.config['analysis']['accessibility_threshold_km']
+            thresholds_km = cast(List[float], self.config['analysis']['accessibility_threshold_km'])
         
         self.logger.info(f"Classifying accessibility with thresholds: {thresholds_km}")
         
