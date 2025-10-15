@@ -1,5 +1,7 @@
 from pathlib import Path
 from typing import Optional
+import geopandas as gpd
+from src.processor.base import BaseProcessor
 
 class VectorProcessor(BaseProcessor):
     """Process vector (shapefile, geojson) data"""
