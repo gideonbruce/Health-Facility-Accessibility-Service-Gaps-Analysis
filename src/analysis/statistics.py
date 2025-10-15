@@ -1,5 +1,7 @@
 import json
 from typing import Dict
+import geopandas as gpd
+from src.analysis.base import BaseAnalyzer
 
 class StatisticsAnalyzer(BaseAnalyzer):
     """Generate summary statistics"""

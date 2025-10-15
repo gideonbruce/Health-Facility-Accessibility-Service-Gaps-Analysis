@@ -1,8 +1,4 @@
-
 from abc import ABC, abstractmethod
-from logging import Logger
-
-from config import Config
 
 class BaseAnalyzer(ABC):
     """Abstract base class for analysis modules"""

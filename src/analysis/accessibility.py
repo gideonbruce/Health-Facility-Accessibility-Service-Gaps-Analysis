@@ -1,5 +1,6 @@
 import numpy as np
 from shapely.geometry import Point
+import geopandas as gpd
 
 class AccessibilityAnalyzer(BaseAnalyzer):
     """Analyze healthcare accessibility"""
