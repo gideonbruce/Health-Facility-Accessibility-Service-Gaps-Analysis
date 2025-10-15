@@ -1,0 +1,112 @@
+# ================================================================
+#  Project: Health Facility Accessibility Service Gaps Analysis
+#  Configuration File
+# ================================================================
+data_dir: "data"
+output_dir: "outputs"
+
+project:
+  name: "Health Facility Accessibility Service Gaps Analysis"
+  country: "Kenya"
+  region: "Kisii County"
+  crs: "EPSG:4326"       # Coordinate reference system for input data
+  output_crs: "EPSG:3857" # CRS for analysis/visualization
+
+# ----------------------------------------------------------------
+#  DATA SOURCES
+# ----------------------------------------------------------------
+data:
+  population:
+    path: "data/population/population_grid.geojson"
+    field: "population"         # Attribute field for population counts
+  facilities:
+    path: "data/facilities/health_facilities.geojson"
+    name_field: "facility_name" # Field containing facility name
+    type_field: "facility_type" # Hospital, clinic, etc.
+  roads:
+    path: "data/roads/road_network.geojson"
+    speed_field: "speed_kph"    # For travel time calculation
+  admin_boundaries:
+    path: "data/admin/wards.geojson"
+    id_field: "ward_id"
+    name_field: "ward_name"
+
+
+
+download:
+  enabled: true    
+  boundaries:
+    enabled: true
+    url: "https://example.com/admin_boundaries.geojson"
+    filename: "admin_boundaries.geojson"               # whether to auto-download data
+  target_dir: "data/raw"          # where to store downloaded files
+  sources:
+    population:
+      url: "https://example.com/population.geojson"
+      filename: "population.geojson"
+    facilities:
+      url: "https://example.com/health_facilities.geojson"
+      filename: "health_facilities.geojson"
+    roads:
+      url: "https://example.com/road_network.geojson"
+      filename: "road_network.geojson"
+
+# ----------------------------------------------------------------
+#  TRAVEL & ACCESSIBILITY PARAMETERS
+# ----------------------------------------------------------------
+travel:
+  mode: "driving"         # Options: driving, walking, cycling
+  max_travel_time: 60     # minutes
+  speed_defaults:         # fallback speeds (if not in data)
+    driving: 50
+    walking: 5
+    cycling: 15
+  travel_cost_metric: "time"  # or "distance"
+  routing_engine: "osmnx"     # or "osrm", "graphhopper"
+
+# ----------------------------------------------------------------
+#  SERVICE GAP THRESHOLDS
+# ----------------------------------------------------------------
+accessibility:
+  service_radius_km: 10         # direct buffer distance (optional)
+  catchment_thresholds: [15, 30, 60]  # minutes, for accessibility classification
+  gap_definition: "population_outside_30min"
+  min_population_gap: 1000      # minimum population outside threshold to flag a gap
+
+# ----------------------------------------------------------------
+#  ANALYSIS OPTIONS
+# ----------------------------------------------------------------
+analysis:
+  aggregate_by: "ward"         # admin level to summarize accessibility
+  weighting: "population"      # population-weighted accessibility
+  output_tables: true
+  output_maps: true
+  save_intermediate: false
+
+# ----------------------------------------------------------------
+#  VISUALIZATION
+# ----------------------------------------------------------------
+visualization:
+  map_title: "Health Service Accessibility"
+  colormap: "YlOrRd"          # Matplotlib colormap name
+  legend_labels: ["< 15 min", "15–30 min", "30–60 min", "> 60 min"]
+  show_facilities: true
+  basemap: "OpenStreetMap"
+  output_format: "png"
+
+# ----------------------------------------------------------------
+#  OUTPUT PATHS
+# ----------------------------------------------------------------
+output:
+  directory: "outputs"
+  accessibility_map: "outputs/accessibility_map.png"
+  gap_table: "outputs/service_gaps.csv"
+  reports: "outputs/reports/"
+
+# ----------------------------------------------------------------
+#  LOGGING
+# ----------------------------------------------------------------
+logging:
+  level: "INFO"               # DEBUG, INFO, WARNING, ERROR
+  log_file: "logs/accessibility.log"
+  overwrite: true
