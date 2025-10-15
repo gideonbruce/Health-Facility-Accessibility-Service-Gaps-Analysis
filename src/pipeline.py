@@ -1,5 +1,7 @@
 from logging import Logger
 from pathlib import Path
+import geopandas as gpd
+from src.config import Config
 
 class Pipeline:
     """Main orchestration pipeline"""
