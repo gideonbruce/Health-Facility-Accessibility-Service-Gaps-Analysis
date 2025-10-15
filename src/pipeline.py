@@ -1,4 +1,4 @@
-from logging import Logger
+from src.logger import Logger
 from pathlib import Path
 import geopandas as gpd
 from src.config import Config
@@ -27,12 +27,12 @@ class Pipeline:
         facilities_path = None
         
         if download_config['boundaries']:
-            from src.downloader import GADMDownloader
+            from src.downloader.gadm import GADMDownloader
             downloader = GADMDownloader(str(data_dir / "Administrative_boundaries"))
             downloader.download()
         
         if download_config['facilities']:
-            from src.downloader import HealthsitesDownloader
+            from src.downloader.healthsites import HealthsitesDownloader
             downloader = HealthsitesDownloader(
                 str(data_dir / "Health_facilities"),
                 self.config['iso_code_3166']
@@ -47,7 +47,7 @@ class Pipeline:
         self.logger.info("STEP 2: Processing Data")
         self.logger.info("="*70)
         
-        from src.processor import VectorProcessor
+        from src.processor.vector import VectorProcessor
         
         processor = VectorProcessor(self.config)
         data_dir = Path(self.config['data_dir'])
@@ -76,8 +76,9 @@ class Pipeline:
         self.logger.info("STEP 3: Analyzing Accessibility")
         self.logger.info("="*70)
         
-        from src.analysis import AccessibilityAnalyzer, StatisticsAnalyzer
-        
+        from src.analysis.accessibility import AccessibilityAnalyzer
+        from src.analysis.statistics import StatisticsAnalyzer
+
         # Create population grid
         accessibility_analyzer = AccessibilityAnalyzer(self.config)
         population_grid = accessibility_analyzer.create_population_grid(boundaries)
@@ -102,7 +103,7 @@ class Pipeline:
         self.logger.info("STEP 4: Generating Visualizations")
         self.logger.info("="*70)
         
-        from src.visualization import FacilityMapVisualizer, AccessibilityMapVisualizer
+        from src.visualization.maps import FacilityMapVisualizer, AccessibilityMapVisualizer
         
         viz_config = self.config['visualization']
         output_dir = self.config['output_dir']
@@ -142,7 +143,7 @@ class Pipeline:
             driver='GeoJSON'
         )
         
-        from src.analysis import StatisticsAnalyzer
+        from src.analysis.statistics import StatisticsAnalyzer
         stats_analyzer = StatisticsAnalyzer(self.config)
         stats_analyzer.save_stats(stats, str(output_dir / "statistics.json"))
         
