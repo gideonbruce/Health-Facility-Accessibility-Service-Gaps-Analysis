@@ -4,18 +4,15 @@ import geopandas as gpd
 from src.analysis.base import BaseAnalyzer
 
 class StatisticsAnalyzer(BaseAnalyzer):
-    """Generate summary statistics"""
-    
     def calculate_stats(
         self,
         facilities: gpd.GeoDataFrame,
         accessibility: gpd.GeoDataFrame
     ) -> Dict:
-        """Calculate summary statistics"""
         self.logger.info("Calculating summary statistics...")
-        
+
         thresholds = self.config['analysis']['accessibility_threshold_km']
-        
+
         stats = {
             'total_facilities': int(len(facilities)),
             'distance_statistics': {
@@ -41,11 +38,11 @@ class StatisticsAnalyzer(BaseAnalyzer):
         return stats
     
     def save_stats(self, stats: Dict, output_path: str) -> None:
-        """Save statistics to JSON"""
-        self.logger.info(f"Saving statistics to {output_path}")
+        #saving statistics to JSON
+        self.logger.info(f"Saving statistics to {output_path}...")
         with open(output_path, 'w') as f:
             json.dump(stats, f, indent=2)
     
     def analyze(self, facilities: gpd.GeoDataFrame, accessibility: gpd.GeoDataFrame) -> Dict:
-        """Complete statistics analysis"""
+        #returns complete statistics analysis
         return self.calculate_stats(facilities, accessibility)

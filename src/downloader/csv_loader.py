@@ -4,7 +4,6 @@ from src.downloader.base import BaseDownloader
 
 class CSVDataLoader(BaseDownloader):
     """Load specialist or facility data from CSV files"""
-    
     def __init__(self, output_dir: str, csv_path: str, lat_col: str = 'latitude', 
                  lon_col: str = 'longitude'):
         super().__init__(output_dir)
@@ -23,14 +22,14 @@ class CSVDataLoader(BaseDownloader):
         - type/category (optional)
         - specialty (optional, for specialists)
         """
-        self.logger.info(f"Loading CSV data from {self.csv_path}")
+        self.logger.info(f"Loading CSV data from {self.csv_path}...")
         
         try:
-            # Load CSV
+            #load CSV
             df = pd.read_csv(self.csv_path)
             self.logger.info(f"Loaded {len(df)} records from CSV")
             
-            # Validate columns
+            #Validating columns
             if self.lat_col not in df.columns or self.lon_col not in df.columns:
                 raise ValueError(
                     f"CSV must contain '{self.lat_col}' and '{self.lon_col}' columns. "
@@ -41,12 +40,12 @@ class CSVDataLoader(BaseDownloader):
             df = df.dropna(subset=[self.lat_col, self.lon_col])
             self.logger.info(f"Retained {len(df)} records with valid coordinates")
             
-            # Create GeoDataFrame
+            #create GeoDataFrame
             from shapely.geometry import Point
             geometry = [Point(xy) for xy in zip(df[self.lon_col], df[self.lat_col])]
             gdf = gpd.GeoDataFrame(df, geometry=geometry, crs='EPSG:4326')
             
-            # Save as GeoJSON
+            #saving as GeoJSON
             output_path = self.output_dir / "csv_data.geojson"
             gdf.to_file(output_path, driver='GeoJSON')
             self.logger.info(f"Saved GeoJSON to {output_path}")

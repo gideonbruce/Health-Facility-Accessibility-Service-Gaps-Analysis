@@ -1,5 +1,5 @@
+from typing import Optional
 import requests
-import zipfile
 from pathlib import Path
 
 from src.downloader.base import BaseDownloader
@@ -14,7 +14,7 @@ class DEMDownloader(BaseDownloader):
     3. ALOS World 3D - 30m resolution
     """
     
-    def __init__(self, output_dir: str, bounds: tuple = None):
+    def __init__(self, output_dir: str, bounds: Optional[tuple] = None):
         super().__init__(output_dir)
         self.bounds = bounds  # (minx, miny, maxx, maxy)
     

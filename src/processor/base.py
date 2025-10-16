@@ -1,12 +1,10 @@
 from abc import ABC, abstractmethod
-from logging import Logger
+from logger import Logger
 import geopandas as gpd
 
-from config import Config
+from src.config import Config
 
 class BaseProcessor(ABC):
-    """Abstract base class for data processors"""
-    
     def __init__(self, config: Config):
         self.config = config
         self.logger = Logger.get(self.__class__.__name__)
