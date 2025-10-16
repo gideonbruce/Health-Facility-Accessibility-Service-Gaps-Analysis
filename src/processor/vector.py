@@ -30,10 +30,10 @@ class VectorProcessor(BaseProcessor):
     
     def reproject(self, gdf: gpd.GeoDataFrame, crs: int) -> gpd.GeoDataFrame:
         """Reproject to target CRS"""
-        self.logger.info(f"Reprojecting to EPSG:{crs}")
+        self.logger.info(f"Reprojecting to {crs}")
         if gdf.crs is None:
             gdf.set_crs(self.config['crs_wgs84'], inplace=True)
-        return gdf.to_crs(epsg=crs)
+        return gdf.to_crs(crs=crs)
     
     def remove_empty_geometry(self, gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         """Remove features with empty geometry"""

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from logger import Logger
 import geopandas as gpd
 
+from src.logger import Logger
 from src.config import Config
 
 class BaseProcessor(ABC):
