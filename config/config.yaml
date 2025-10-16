@@ -2,7 +2,7 @@
 #  Project: Health Facility Accessibility Service Gaps Analysis
 #  Configuration File
 # ================================================================
-data_dir: "data"
+
 output_dir: "outputs"
 
 project:
@@ -15,7 +15,7 @@ project:
 # ----------------------------------------------------------------
 #  DATA SOURCES
 # ----------------------------------------------------------------
-data:
+data_dir:
   population:
     path: "data/population/population_grid.geojson"
     field: "population"         # Attribute field for population counts
