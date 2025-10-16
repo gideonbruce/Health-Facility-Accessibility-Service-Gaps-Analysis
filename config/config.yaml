@@ -1,7 +1,12 @@
 # ================================================================
 #  Project: Health Facility Accessibility Service Gaps Analysis
-#  Configuration File
 # ================================================================
+
+country_code: "KEN"
+
+crs: "EPSG:4326"
+output_crs: "EPSG:3857"
+crs_utm: "EPSG:32737"
 
 output_dir: "outputs"
 
@@ -9,76 +14,69 @@ project:
   name: "Health Facility Accessibility Service Gaps Analysis"
   country: "Kenya"
   region: "Kisii County"
-  crs: "EPSG:4326"       # Coordinate reference system for input data
-  output_crs: "EPSG:3857" # CRS for analysis/visualization
+  crs: "EPSG:4326"         # CRS for input data
+  output_crs: "EPSG:3857"  # CRS for analysis/visualization    # Example UTM CRS for Kenya
 
 # ----------------------------------------------------------------
-#  DATA SOURCES
+#  DATA SOURCES (All local)
 # ----------------------------------------------------------------
-data_dir:
-  population:
-    path: "data/population/population_grid.geojson"
-    field: "population"         # Attribute field for population counts
-  facilities:
-    path: "data/facilities/health_facilities.geojson"
-    name_field: "facility_name" # Field containing facility name
-    type_field: "facility_type" # Hospital, clinic, etc.
-  roads:
-    path: "data/roads/road_network.geojson"
-    speed_field: "speed_kph"    # For travel time calculation
-  admin_boundaries:
-    path: "data/admin/wards.geojson"
-    id_field: "ward_id"
-    name_field: "ward_name"
+data_dir: "data"
 
+population:
+  raster: "data/population/population.tif"
+  zonal_output: "data/population/population_by_admin.geojson"
+  field: "population"
 
+facilities:
+  csv: "data/facilities/facilities.csv"
+  geojson: "data/facilities/facilities.geojson"
+  name_field: "Facility_N"
+  type_field: "Type"
 
+roads:
+  path: "data/roads/road_network.geojson"
+  speed_field: "speed_kph"
+
+admin_boundaries:
+  folder: "data/Administrative_boundaries"   # folder containing all shapefiles
+  crs_field: "EPSG:32737"                    # UTM CRS for processing
+  id_field: "ward_id"                        # optional
+  name_field: "ward_name"                    # optional
+
+# ----------------------------------------------------------------
+#  DOWNLOAD OPTIONS (disabled for fully offline)
+# ----------------------------------------------------------------
 download:
-  enabled: true    
-  boundaries:
-    enabled: true
-    url: "https://example.com/admin_boundaries.geojson"
-    filename: "admin_boundaries.geojson"               # whether to auto-download data
-  target_dir: "data/raw"          # where to store downloaded files
-  sources:
-    population:
-      url: "https://example.com/population.geojson"
-      filename: "population.geojson"
-    facilities:
-      url: "https://example.com/health_facilities.geojson"
-      filename: "health_facilities.geojson"
-    roads:
-      url: "https://example.com/road_network.geojson"
-      filename: "road_network.geojson"
+  enabled: false
 
 # ----------------------------------------------------------------
 #  TRAVEL & ACCESSIBILITY PARAMETERS
 # ----------------------------------------------------------------
 travel:
-  mode: "driving"         # Options: driving, walking, cycling
-  max_travel_time: 60     # minutes
-  speed_defaults:         # fallback speeds (if not in data)
+  mode: "driving"         
+  max_travel_time: 60     
+  speed_defaults:         
     driving: 50
     walking: 5
     cycling: 15
-  travel_cost_metric: "time"  # or "distance"
-  routing_engine: "osmnx"     # or "osrm", "graphhopper"
+  travel_cost_metric: "time"
+  routing_engine: "osmnx"
 
 # ----------------------------------------------------------------
 #  SERVICE GAP THRESHOLDS
 # ----------------------------------------------------------------
 accessibility:
-  service_radius_km: 10         # direct buffer distance (optional)
-  catchment_thresholds: [15, 30, 60]  # minutes, for accessibility classification
+  service_radius_km: 10
+  catchment_thresholds: [15, 30, 60]  
   gap_definition: "population_outside_30min"
-  min_population_gap: 1000      # minimum population outside threshold to flag a gap
+  min_population_gap: 1000
 
 # ----------------------------------------------------------------
 #  ANALYSIS OPTIONS
 # ----------------------------------------------------------------
 analysis:
-  aggregate_by: "ward"         # admin level to summarize accessibility
-  weighting: "population"      # population-weighted accessibility
+  aggregate_by: "ward"
+  weighting: "population"
   output_tables: true
   output_maps: true
   save_intermediate: false
@@ -88,7 +86,7 @@ analysis:
 # ----------------------------------------------------------------
 visualization:
   map_title: "Health Service Accessibility"
-  colormap: "YlOrRd"          # Matplotlib colormap name
+  colormap: "YlOrRd"
   legend_labels: ["< 15 min", "15–30 min", "30–60 min", "> 60 min"]
   show_facilities: true
   basemap: "OpenStreetMap"
@@ -107,6 +105,6 @@ output:
 #  LOGGING
 # ----------------------------------------------------------------
 logging:
-  level: "INFO"               # DEBUG, INFO, WARNING, ERROR
+  level: "INFO"
   log_file: "logs/accessibility.log"
   overwrite: true
