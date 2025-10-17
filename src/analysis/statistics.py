@@ -11,7 +11,7 @@ class StatisticsAnalyzer(BaseAnalyzer):
     ) -> Dict:
         self.logger.info("Calculating summary statistics...")
 
-        thresholds = self.config['analysis']['accessibility_threshold_km']
+        thresholds = self.config['accessibility']['catchment_thresholds']
 
         stats = {
             'total_facilities': int(len(facilities)),

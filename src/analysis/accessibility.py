@@ -32,7 +32,10 @@ class AccessibilityAnalyzer(BaseAnalyzer):
     ) -> gpd.GeoDataFrame:
         #classifying accessibility by threshold
         if thresholds_km is None:
-            thresholds_km = cast(List[float], self.config['analysis']['accessibility_threshold_km'])
+            thresholds_km = cast(
+                List[float],
+                self.config['accessibility']['catchment_thresholds']
+            )
         
         self.logger.info(f"Classifying accessibility with thresholds: {thresholds_km}")
         
