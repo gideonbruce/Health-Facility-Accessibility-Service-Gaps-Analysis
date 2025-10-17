@@ -1,0 +1,24 @@
+{
+  "total_facilities": 9995,
+  "distance_statistics": {
+    "mean_km": 53.92636335794069,
+    "median_km": 22.93060534027392,
+    "std_km": 67.2687492338677,
+    "min_km": 0.10341853906922256,
+    "max_km": 364.1390688557434
+  },
+  "accessibility_by_threshold": {
+    "15km": {
+      "count": 158,
+      "percentage": 39.5
+    },
+    "30km": {
+      "count": 226,
+      "percentage": 56.49999999999999
+    },
+    "60km": {
+      "count": 277,
+      "percentage": 69.25
+    }
+  }
+}
