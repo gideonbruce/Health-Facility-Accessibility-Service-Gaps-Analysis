@@ -8,15 +8,18 @@ class FacilityMapVisualizer(BaseVisualizer):
     def generate(self, facilities: gpd.GeoDataFrame, boundaries: gpd.GeoDataFrame) -> str:
         """Generate facility map"""
         self.logger.info("Generating facility map...")
-        
-        center = self.config['center']
-        zoom = self.config['zoom_level']
+        bounds = boundaries.to_crs('EPSG:4326').total_bounds  # [minx, miny, maxx, maxy]
+        center = [(bounds[1] + bounds[3]) / 2, (bounds[0] + bounds[2]) / 2]  # [lat, lon]
+        zoom = self.config.get('zoom_level', 10)  # Default to 10 if not specified
         
         m = folium.Map(location=center, zoom_start=zoom)
         
         # Add boundaries
         folium.GeoJson(
-            boundaries.to_json(),
+            boundaries.copy().assign(**{
+                col: boundaries[col].astype(str)
+                for col in boundaries.select_dtypes(include=['datetime64']).columns
+            }).to_json(),
             style_function=lambda x: {'color': 'blue', 'weight': 2, 'fillOpacity': 0.1}
         ).add_to(m)
         
@@ -45,8 +48,9 @@ class AccessibilityMapVisualizer(BaseVisualizer):
         """Generate accessibility map"""
         self.logger.info("Generating accessibility map...")
         
-        center = self.config['center']
-        zoom = self.config['zoom_level']
+        bounds = accessibility.to_crs('EPSG:4326').total_bounds
+        center = [(bounds[1] + bounds[3]) / 2, (bounds[0] + bounds[2]) / 2]
+        zoom = self.config.get('zoom_level', 10)
         
         m = folium.Map(location=center, zoom_start=zoom)
         
