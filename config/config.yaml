@@ -85,7 +85,11 @@ analysis:
 #  VISUALIZATION
 # ----------------------------------------------------------------
 visualization:
+  generate_facility_map: true
+  generate_accessibility_map: true
+  # center: [-0.6799, 34.7519]
   map_title: "Health Service Accessibility"
+  zoom_level: 10
   colormap: "YlOrRd"
   legend_labels: ["< 15 min", "15–30 min", "30–60 min", "> 60 min"]
   show_facilities: true
