@@ -1,3 +1,5 @@
+# src/visualization/maps
+
 import folium
 import geopandas as gpd
 from src.visualization.base import BaseVisualizer
