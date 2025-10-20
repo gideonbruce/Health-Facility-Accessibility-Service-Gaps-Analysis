@@ -34,8 +34,8 @@ facilities:
   type_field: "Type"
 
 roads:
-  path: "data/roads/road_network.geojson"
-  speed_field: "speed_kph"
+  path: "data/roads/hotosm_ken_roads_lines_gpkg.gpkg"
+  place_name: ""
 
 admin_boundaries:
   folder: "data/Administrative_boundaries"   # folder containing all shapefiles
