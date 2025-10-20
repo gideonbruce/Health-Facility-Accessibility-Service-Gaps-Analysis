@@ -4,6 +4,7 @@ import geopandas as gpd
 from src.config import Config
 from src.population.zonal_extractor import PopulationZonalExtractor
 from src.loaders.facilities_loader import FacilitiesLoader
+from src.loaders.roads_loader import RoadsLoader
 
 class Pipeline:
     """Main orchestration pipeline"""
@@ -99,7 +100,14 @@ class Pipeline:
 
         self.logger.info(f"✓ Loaded {len(facilities)} facilities after processing")
         return boundaries, facilities
-
+    
+    def load_roads(self) -> gpd.GeoDataFrame:
+        self.logger.info("\n" + "="*70)
+        self.logger.info("STEP X: Loading Road Network")
+        self.logger.info("="*70)
+        roads_loader = RoadsLoader({**dict(self.config), "logger": self.logger})
+        roads = roads_loader.load()
+        return roads
 
     def analyze_accessibility(self, facilities: gpd.GeoDataFrame, boundaries: gpd.GeoDataFrame) -> tuple:
         """Analyze accessibility"""
@@ -140,19 +148,22 @@ class Pipeline:
         output_dir = self.config['output_dir']
         
         if viz_config['generate_facility_map']:
+            facilities_wgs84 = facilities.to_crs(epsg=4326)
             viz = FacilityMapVisualizer(self.config, output_dir)
-            viz.generate(facilities, boundaries)
+            viz.generate(facilities_wgs84, boundaries)
         
         if viz_config['generate_accessibility_map']:
+            accessibility_wgs84 = accessibility.to_crs(epsg=4326)
             viz = AccessibilityMapVisualizer(self.config, output_dir)
-            viz.generate(accessibility)
+            viz.generate(accessibility_wgs84)
     
     def save_outputs(
         self,
         boundaries: gpd.GeoDataFrame,
         facilities: gpd.GeoDataFrame,
         accessibility: gpd.GeoDataFrame,
-        stats: dict
+        stats: dict,
+        roads=None
     ) -> None:
         """Save processed data and results"""
         self.logger.info("\n" + "="*70)
@@ -173,6 +184,9 @@ class Pipeline:
             str(output_dir / "accessibility_grid.geojson"),
             driver='GeoJSON'
         )
+        if roads is not None:
+            roads.to_file(output_dir / "roads.geojson", driver='GeoJSON')
+            self.logger.info("  Roads saved to output folder")
         
         from src.analysis.statistics import StatisticsAnalyzer
         stats_analyzer = StatisticsAnalyzer(self.config)
