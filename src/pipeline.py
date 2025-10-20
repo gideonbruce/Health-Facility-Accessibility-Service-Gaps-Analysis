@@ -72,10 +72,6 @@ class Pipeline:
         
         self.logger.info(f"Loading administrative boundaries from: {shp_path}")
         boundaries = processor.load_shapefile(str(shp_path))
-        #boundaries = processor.filter_by_country(
-            #boundaries,
-            #self.config['country_code']
-        #)
         boundaries = processor.reproject(boundaries, self.config['crs_utm'])
         
         # --- Load health facilities from local CSV ---
@@ -135,27 +131,50 @@ class Pipeline:
         self,
         facilities: gpd.GeoDataFrame,
         boundaries: gpd.GeoDataFrame,
-        accessibility: gpd.GeoDataFrame
+        accessibility: gpd.GeoDataFrame,
+        population: gpd.GeoDataFrame = None
     ) -> None:
-        """Generate visualizations"""
+        """Generate visualizations including choropleths"""
         self.logger.info("\n" + "="*70)
         self.logger.info("STEP 4: Generating Visualizations")
         self.logger.info("="*70)
         
-        from src.visualization.maps import FacilityMapVisualizer, AccessibilityMapVisualizer
+        from src.visualization.maps import (
+            FacilityMapVisualizer,
+            AccessibilityMapVisualizer,
+            PopulationChoroplethVisualizer,
+            AccessibilityChoroplethVisualizer
+        )
         
         viz_config = self.config['visualization']
         output_dir = self.config['output_dir']
         
-        if viz_config['generate_facility_map']:
+        # Generate facility map
+        if viz_config.get('generate_facility_map', True):
             facilities_wgs84 = facilities.to_crs(epsg=4326)
+            boundaries_wgs84 = boundaries.to_crs(epsg=4326)
             viz = FacilityMapVisualizer(self.config, output_dir)
-            viz.generate(facilities_wgs84, boundaries)
+            viz.generate(facilities_wgs84, boundaries_wgs84)
         
-        if viz_config['generate_accessibility_map']:
+        # Generate accessibility point map
+        if viz_config.get('generate_accessibility_map', True):
             accessibility_wgs84 = accessibility.to_crs(epsg=4326)
             viz = AccessibilityMapVisualizer(self.config, output_dir)
             viz.generate(accessibility_wgs84)
+        
+        # Generate population choropleth
+        if viz_config.get('generate_population_choropleth', True) and population is not None:
+            viz = PopulationChoroplethVisualizer(self.config, output_dir)
+            viz.generate(population, metric='population')
+            
+            # If population density exists, create that choropleth too
+            if 'population_density' in population.columns:
+                viz.generate(population, metric='population_density')
+        
+        # Generate accessibility choropleth by administrative region
+        if viz_config.get('generate_accessibility_choropleth', True):
+            viz = AccessibilityChoroplethVisualizer(self.config, output_dir)
+            viz.generate(boundaries, accessibility, facilities)
     
     def save_outputs(
         self,
@@ -163,6 +182,7 @@ class Pipeline:
         facilities: gpd.GeoDataFrame,
         accessibility: gpd.GeoDataFrame,
         stats: dict,
+        population: gpd.GeoDataFrame = None,
         roads=None
     ) -> None:
         """Save processed data and results"""
@@ -184,6 +204,14 @@ class Pipeline:
             str(output_dir / "accessibility_grid.geojson"),
             driver='GeoJSON'
         )
+        
+        if population is not None:
+            population.to_file(
+                str(output_dir / "population_by_region.geojson"),
+                driver='GeoJSON'
+            )
+            self.logger.info("  Population data saved to output folder")
+        
         if roads is not None:
             roads.to_file(output_dir / "roads.geojson", driver='GeoJSON')
             self.logger.info("  Roads saved to output folder")
@@ -207,10 +235,10 @@ class Pipeline:
             # STEP 2: Data processing
             boundaries, facilities = self.process_data()
 
-            # STEP 3: Population zonal statistics (NEW)
+            # STEP 3: Population zonal statistics
             from src.population.zonal_extractor import PopulationZonalExtractor
             
-            pop_raster_path = self.config['population']['raster']  # path from config.yaml
+            pop_raster_path = self.config['population']['raster']
             pop_output_path = self.config['population']['zonal_output']
 
             self.logger.info("\n" + "="*70)
@@ -228,11 +256,11 @@ class Pipeline:
             # STEP 4: Accessibility analysis
             accessibility, stats = self.analyze_accessibility(facilities, boundaries)
 
-            # STEP 5: Visualization
-            self.visualize(facilities, boundaries, accessibility)
+            # STEP 5: Visualization (now includes choropleths)
+            self.visualize(facilities, boundaries, accessibility, pop_gdf)
 
             # STEP 6: Save outputs
-            self.save_outputs(boundaries, facilities, accessibility, stats)
+            self.save_outputs(boundaries, facilities, accessibility, stats, pop_gdf)
 
             self.logger.info("\n" + "="*70)
             self.logger.info("✓ PIPELINE COMPLETED SUCCESSFULLY")
