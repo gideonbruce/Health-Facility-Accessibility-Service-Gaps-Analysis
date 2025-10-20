@@ -276,4 +276,3 @@ class Pipeline:
 
         except Exception as e:
             self.logger.error(f"Pipeline failed: {e}", exc_info=True)
-            raise
