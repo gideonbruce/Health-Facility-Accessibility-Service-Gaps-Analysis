@@ -144,6 +144,10 @@ class PopulationChoroplethVisualizer(BaseVisualizer):
         if population_gdf.crs != 'EPSG:4326':
             population_gdf = population_gdf.to_crs('EPSG:4326')
         
+        # Convert datetime columns to strings to avoid JSON serialization errors
+        for col in population_gdf.select_dtypes(include=['datetime64']).columns:
+            population_gdf[col] = population_gdf[col].astype(str)
+        
         bounds = population_gdf.total_bounds
         center = [(bounds[1] + bounds[3]) / 2, (bounds[0] + bounds[2]) / 2]
         zoom = self.config['visualization'].get('zoom_level', 8)
@@ -157,10 +161,14 @@ class PopulationChoroplethVisualizer(BaseVisualizer):
         # Get colormap from config
         colormap = self.config['visualization'].get('colormap', 'YlOrRd')
         
-        # Reset index to ensure we have an index column
+        # Reset index and convert datetime columns to strings BEFORE creating GeoJSON
         population_gdf_indexed = population_gdf.reset_index(drop=False)
         if 'index' not in population_gdf_indexed.columns:
             population_gdf_indexed['index'] = range(len(population_gdf_indexed))
+        
+        # Convert datetime columns to strings
+        for col in population_gdf_indexed.select_dtypes(include=['datetime64']).columns:
+            population_gdf_indexed[col] = population_gdf_indexed[col].astype(str)
         
         # Create choropleth
         folium.Choropleth(
@@ -183,17 +191,17 @@ class PopulationChoroplethVisualizer(BaseVisualizer):
         name_field = self.config['admin_boundaries'].get('name_field', 'ward_name')
         id_field = self.config['admin_boundaries'].get('id_field', 'ward_id')
         
-        if name_field and name_field in population_gdf.columns:
+        if name_field and name_field in population_gdf_indexed.columns:
             tooltip_fields.insert(0, name_field)
             tooltip_aliases.insert(0, name_field.replace('_', ' ').title())
         
-        if id_field and id_field in population_gdf.columns:
+        if id_field and id_field in population_gdf_indexed.columns:
             tooltip_fields.append(id_field)
             tooltip_aliases.append(id_field.replace('_', ' ').title())
         
         # Add tooltips with detailed info
         folium.GeoJson(
-            population_gdf,
+            population_gdf_indexed,
             style_function=lambda x: {
                 'fillColor': 'transparent',
                 'color': 'black',
