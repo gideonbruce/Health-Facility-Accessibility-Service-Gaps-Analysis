@@ -322,6 +322,13 @@ class AccessibilityChoroplethVisualizer(BaseVisualizer):
         # Convert to WGS84 for mapping
         boundaries_with_stats = boundaries_with_stats.to_crs('EPSG:4326')
         
+        for col in boundaries_with_stats.select_dtypes(include=['datetime64']).columns:
+            boundaries_with_stats[col] = boundaries_with_stats[col].astype(str)
+
+        # Reset index and ensure 'index' column exists for Choropleth
+        boundaries_with_stats = boundaries_with_stats.reset_index(drop=True)
+        boundaries_with_stats['index'] = range(len(boundaries_with_stats))
+        
         bounds = boundaries_with_stats.total_bounds
         center = [(bounds[1] + bounds[3]) / 2, (bounds[0] + bounds[2]) / 2]
         zoom = self.config['visualization'].get('zoom_level', 8)
