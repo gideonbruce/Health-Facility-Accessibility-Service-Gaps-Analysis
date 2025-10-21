@@ -95,6 +95,7 @@ visualization:
   show_facilities: true
   basemap: "OpenStreetMap"
   output_format: "png"
+  generate_isoline_map: true
 
 # ----------------------------------------------------------------
 #  OUTPUT PATHS
