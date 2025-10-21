@@ -145,6 +145,7 @@ class Pipeline:
             PopulationChoroplethVisualizer,
             AccessibilityChoroplethVisualizer
         )
+        from src.visualization.isoline import IsolineMapVisualizer
         
         viz_config = self.config['visualization']
         output_dir = self.config['output_dir']
@@ -175,6 +176,11 @@ class Pipeline:
         if viz_config.get('generate_accessibility_choropleth', True):
             viz = AccessibilityChoroplethVisualizer(self.config, output_dir)
             viz.generate(boundaries, accessibility, facilities)
+        
+        # Generates isolines
+        if viz_config.get('generate_isoline_map', True):
+            viz = IsolineMapVisualizer(self.config, output_dir)
+            viz.generate(accessibility, boundaries, facilities)
     
     def save_outputs(
         self,
