@@ -68,9 +68,6 @@ Installation
 
 Clone the repository:
 
-git clone https://github.com/your-username/HFASGA.git
-cd HFASGA
-
 
 Create and activate a conda environment:
 
